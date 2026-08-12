@@ -22,6 +22,11 @@ export class EmailRegistry extends BaseEntityExtended {
   @Field(() => Date, { nullable: true })
   code_expires_at?: Date;
 
+  /** Whether the email address has completed verification */
+  @Column({ default: false, nullable: false })
+  @Field(() => Boolean, { nullable: false })
+  is_verified: boolean;
+
   /** Opt-in status for general news notifications */
   @Column({ default: false, nullable: false })
   @Field(() => Boolean, { nullable: false })

@@ -81,6 +81,14 @@ export enum CommunicationSentStatus {
   FAILED = 'Failed',
 }
 
+/**
+ * Mailing-list notification types used for recipient preference filtering.
+ */
+export enum NotificationPreferenceType {
+  NEWS = 'NEWS',
+  NEW_DATASET = 'NEW_DATASET',
+}
+
 export enum UploadedDatasetStatus {
   PENDING = 'Pending',
   PRIMARY_REVIEW = 'Primary Review',
