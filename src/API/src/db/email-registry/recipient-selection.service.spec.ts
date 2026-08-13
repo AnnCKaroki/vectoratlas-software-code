@@ -139,4 +139,47 @@ describe('RecipientSelectionService', () => {
       expect(emailRegistryRepositoryMock.find).not.toHaveBeenCalled();
     });
   });
+
+  describe('findEligibleRecipientsPaginated', () => {
+    it('queries with eligibility where and skip/take', async () => {
+      emailRegistryRepositoryMock.findAndCount = jest
+        .fn()
+        .mockResolvedValue([[], 0]);
+
+      await service.findEligibleRecipientsPaginated(
+        NotificationPreferenceType.NEW_DATASET,
+        10,
+        5,
+      );
+
+      expect(emailRegistryRepositoryMock.findAndCount).toHaveBeenCalledWith({
+        where: {
+          is_verified: true,
+          is_new_dataset_notification_enabled: true,
+        },
+        order: { email: 'ASC' },
+        skip: 10,
+        take: 5,
+      });
+    });
+
+    it('returns paginated shape', async () => {
+      const rows = [{ email: 'a@example.com' }] as EmailRegistry[];
+      emailRegistryRepositoryMock.findAndCount = jest
+        .fn()
+        .mockResolvedValue([rows, 3]);
+
+      const result = await service.findEligibleRecipientsPaginated(
+        NotificationPreferenceType.NEWS,
+        0,
+        2,
+      );
+
+      expect(result).toEqual({
+        items: rows,
+        total: 3,
+        hasMore: true,
+      });
+    });
+  });
 });

@@ -26,10 +26,12 @@ export const repositoryMockFactory: () => MockType<Repository<any>> = jest.fn(
     find: jest.fn(),
     findOne: jest.fn(),
     update: jest.fn(),
+    create: jest.fn((entity) => entity),
     createQueryBuilder: jest.fn().mockReturnValue(mockQueryBuilder()),
     query: jest.fn(),
     findAndCount: jest.fn(),
     delete: jest.fn(),
+    remove: jest.fn((entity) => entity),
     increment: jest.fn(),
   }),
 );

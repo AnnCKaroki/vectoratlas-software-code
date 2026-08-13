@@ -1,9 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CommunicationLog } from './entities/communication-log.entity';
 import { Repository } from 'typeorm';
 import { HttpService } from '@nestjs/axios';
 import { CommunicationSentStatus } from '../../../src/commonTypes';
+import {
+  RestPaginatedResult,
+  toPaginatedResult,
+} from '../../pagination/rest-pagination';
 
 @Injectable()
 export class CommunicationLogService {
@@ -29,6 +37,20 @@ export class CommunicationLogService {
         modified: 'DESC',
       },
     });
+  }
+
+  async getCommunicationsPaginated(
+    skip: number,
+    take: number,
+  ): Promise<RestPaginatedResult<CommunicationLog>> {
+    const [items, total] = await this.communicationLogRepository.findAndCount({
+      order: {
+        modified: 'DESC',
+      },
+      skip,
+      take,
+    });
+    return toPaginatedResult(items, total, skip, take);
   }
 
   async getCommunicationsBySentStatus(sentStatus: CommunicationSentStatus) {
@@ -58,6 +80,17 @@ export class CommunicationLogService {
     errorDescription: string = null,
   ) {
     const log = await this.getCommunication(id);
+    if (!log) {
+      throw new NotFoundException(`Communication log not found: ${id}`);
+    }
+
+    // Only allow updating sent status when current status is PENDING
+    if (log.sent_status !== CommunicationSentStatus.PENDING) {
+      throw new BadRequestException(
+        `Cannot update sent status for log ${id} because it is not in PENDING state`,
+      );
+    }
+
     let res = null;
     switch (sentStatus) {
       case CommunicationSentStatus.SENT:

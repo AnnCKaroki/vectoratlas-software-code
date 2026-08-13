@@ -9,7 +9,7 @@ import { render } from '@react-email/render';
 import {
   CommunicationChannelType,
   CommunicationSentStatus,
-} from '../../src/commonTypes';
+} from '../commonTypes';
 import {
   AttachmentLikeObject,
   ISendMailOptions,
@@ -65,7 +65,7 @@ export class EmailService {
           cc: copyEmails,
         });
         // // Update sent status
-        this.updateSentStatus(commLog, res);
+        await this.updateSentStatus(commLog, res);
         await this.appendToSent(
           commLog.subject,
           allRecipients,
@@ -194,7 +194,7 @@ export class EmailService {
       communicationLog.sent_date = null;
       communicationLog.reference_entity_type = null;
       communicationLog.reference_entity_name = null;
-      this.communicationLogService.upsert(communicationLog);
+      await this.communicationLogService.upsert(communicationLog);
     }
     return communicationLog;
   }
@@ -213,6 +213,6 @@ export class EmailService {
       communicationLog.sent_response = String(info.response);
       communicationLog.error_description = String(info.response);
     }
-    this.communicationLogService.upsert(communicationLog);
+    await this.communicationLogService.upsert(communicationLog);
   }
 }

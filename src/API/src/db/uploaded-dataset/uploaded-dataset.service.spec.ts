@@ -22,6 +22,7 @@ import * as rxjs from 'rxjs';
 import { HttpStatus, Logger } from '@nestjs/common';
 import { EmailService } from 'src/email/email.service';
 import { MailerModule, MailerService } from '@nestjs-modules/mailer';
+import { NotificationsService } from 'src/notifications/notifications.service';
 
 const getCurrentUser = () => {
   return 'google-oauth2|11555424834';
@@ -36,6 +37,7 @@ describe('UploadedDatasetService', () => {
   let httpClient: MockType<HttpService>;
   let mockMailerService: Partial<MailerService>;
   let userRoleRepositoryMock;
+  let notificationsServiceMock: { enqueueNewDatasetNotification: jest.Mock };
 
   beforeEach(async () => {
     mockMailerService = {
@@ -44,6 +46,9 @@ describe('UploadedDatasetService', () => {
     httpClient = {
       get: jest.fn(),
       post: jest.fn(),
+    };
+    notificationsServiceMock = {
+      enqueueNewDatasetNotification: jest.fn().mockResolvedValue(undefined),
     };
     const module: TestingModule = await Test.createTestingModule({
       imports: [MailerModule],
@@ -56,6 +61,10 @@ describe('UploadedDatasetService', () => {
         DoiService,
         Logger,
         EmailService,
+        {
+          provide: NotificationsService,
+          useValue: notificationsServiceMock,
+        },
         {
           provide: MailerService,
           //useValue: {},

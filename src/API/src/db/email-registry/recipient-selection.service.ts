@@ -2,6 +2,10 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, Repository } from 'typeorm';
 import { NotificationPreferenceType } from '../../commonTypes';
+import {
+  RestPaginatedResult,
+  toPaginatedResult,
+} from '../../pagination/rest-pagination';
 import { EmailRegistry } from './entities/email-registry.entity';
 
 /**
@@ -23,6 +27,21 @@ export class RecipientSelectionService {
       where,
       order: { email: 'ASC' },
     });
+  }
+
+  async findEligibleRecipientsPaginated(
+    notificationType: NotificationPreferenceType,
+    skip: number,
+    take: number,
+  ): Promise<RestPaginatedResult<EmailRegistry>> {
+    const where = this.buildEligibilityWhere(notificationType);
+    const [items, total] = await this.emailRegistryRepository.findAndCount({
+      where,
+      order: { email: 'ASC' },
+      skip,
+      take,
+    });
+    return toPaginatedResult(items, total, skip, take);
   }
 
   private buildEligibilityWhere(

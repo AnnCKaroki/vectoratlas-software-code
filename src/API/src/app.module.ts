@@ -40,6 +40,7 @@ import { BlobCleanupService } from './db/shared/blob-cleanup.service';
 import { AzureBlobService } from './db/azure-blob/azure-blob.service';
 import { CountryModule } from './db/country/country.module';
 import { EmailRegistryModule } from './db/email-registry/entities/email-registry.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -98,6 +99,7 @@ import { EmailRegistryModule } from './db/email-registry/entities/email-registry
     FullOccurrenceDataModule,
     CountryModule,
     EmailRegistryModule,
+    NotificationsModule,
   ],
   controllers: [ConfigController],
   providers: [AzureBlobService, BlobCleanupService],

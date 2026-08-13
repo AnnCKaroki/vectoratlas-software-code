@@ -57,6 +57,7 @@ import { strict } from 'assert';
 import { BlobDownloadResponseParsed } from '@azure/storage-blob';
 import { Readable } from 'stream';
 import { UserRole } from 'src/auth/user_role/user_role.entity';
+import { NotificationsService } from 'src/notifications/notifications.service';
 
 const RAW_DATASET_CONTAINER = 'raw';
 const PRIMARY_REVIEWED_CONTAINER = 'primary-reviewed';
@@ -76,6 +77,7 @@ export class UploadedDatasetService {
     private datasetService: DatasetService,
     @Inject(forwardRef(() => DoiService))
     private readonly doiService: DoiService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async getUploadedDatasets() {
@@ -379,6 +381,7 @@ export class UploadedDatasetService {
       dataset,
     );
 
+    const previousStatus = dataset.status;
     const now = new Date();
     dataset.status = UploadedDatasetStatus.APPROVED;
     dataset.last_status_update_date = now;
@@ -395,6 +398,7 @@ export class UploadedDatasetService {
       dataset,
       userId,
     );
+    await this.enqueueNewDatasetNotificationOnApproval(previousStatus, res);
     // Wrap in try catch since the rest is just auxillary functions
     try {
       // mint DOI if it was requested
@@ -582,6 +586,7 @@ export class UploadedDatasetService {
       dataset,
     );
 
+    const previousStatus = dataset.status;
     const now = new Date();
     dataset.status = UploadedDatasetStatus.APPROVED;
     dataset.last_status_update_date = now;
@@ -598,6 +603,7 @@ export class UploadedDatasetService {
       dataset,
       userId,
     );
+    await this.enqueueNewDatasetNotificationOnApproval(previousStatus, res);
     // Wrap in try catch since the rest is just auxillary functions
     try {
       // mint DOI if it was requested
@@ -1247,6 +1253,34 @@ export class UploadedDatasetService {
     const recipients = await this.getReviewers(dataset, false);
     await this.communicate(dataset, actionType, recipients, message, userId);
     return res;
+  }
+
+  /**
+   * Enqueue mailing-list notification only when status transitions into Approved.
+   * Queue failures must not block the approval response.
+   */
+  private async enqueueNewDatasetNotificationOnApproval(
+    previousStatus: string,
+    dataset: UploadedDataset,
+  ): Promise<void> {
+    if (
+      previousStatus === UploadedDatasetStatus.APPROVED ||
+      dataset.status !== UploadedDatasetStatus.APPROVED
+    ) {
+      return;
+    }
+
+    try {
+      await this.notificationsService.enqueueNewDatasetNotification(
+        dataset.id,
+        dataset.title,
+      );
+    } catch (error) {
+      this.logger.error(
+        `Failed to enqueue new-dataset notification for ${dataset.id}`,
+        error,
+      );
+    }
   }
 
   /**

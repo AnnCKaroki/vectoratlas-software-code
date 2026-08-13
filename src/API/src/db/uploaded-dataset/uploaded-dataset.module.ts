@@ -21,6 +21,7 @@ import { Dataset } from '../shared/entities/dataset.entity';
 import { SharedModule } from '../shared/shared.module';
 import { DatasetUploadModule } from '../../dataset-upload/dataset-upload.module';
 import { DoiModule } from '../doi/doi.module';
+import { NotificationsModule } from '../../notifications/notifications.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { DoiModule } from '../doi/doi.module';
     SharedModule,
     DatasetUploadModule,
     forwardRef(() => DoiModule),
+    NotificationsModule,
     //DoiModule,
     TypeOrmModule.forFeature([
       UploadedDataset,
