@@ -493,6 +493,7 @@
   "NewsPage": {
     "title": "Notícias",
     "createNewArticle": "Crie um novo artigo",
+    "subscribeToNews": "Get news alerts",
     "newsItem": {
       "moreDetails": "Mais detalhes",
       "editItem": "Item de edição",

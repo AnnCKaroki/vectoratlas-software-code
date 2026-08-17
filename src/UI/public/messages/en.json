@@ -22,7 +22,29 @@
     "countryCatalogue": "Country Catalogue",
     "doi": "DOI",
     "admin": "Admin",
+    "subscribe": "Subscribe",
     "translations": "Translations"
+  },
+  "EmailSubscription": {
+    "title": "Subscribe for updates",
+    "description": "Get notified about news and new datasets on VectorAtlas.",
+    "emailLabel": "Email address",
+    "newsAlertsLabel": "News updates",
+    "newDatasetAlertsLabel": "New dataset alerts",
+    "cancelBtn": "Cancel",
+    "closeBtn": "Close",
+    "subscribeBtn": "Subscribe",
+    "successMessage": "Almost done! We've sent a verification link to your email — please check your inbox to confirm your subscription.",
+    "verifySuccessTitle": "Email verified",
+    "verifySuccessBody": "You're all set — you'll now receive the updates you signed up for.",
+    "verifyExpiredTitle": "Link expired",
+    "verifyExpiredBody": "This verification link has expired. Please subscribe again to receive a new one.",
+    "verifyInvalidTitle": "Invalid link",
+    "verifyInvalidBody": "This verification link isn't valid, or has already been used.",
+    "verifyErrorTitle": "Something went wrong",
+    "verifyErrorBody": "We couldn't verify your email right now. Please try again shortly.",
+    "backHomeBtn": "Back to VectorAtlas",
+    "subscribeToNews": "Get news alerts"
   },
   "HomePage": {
     "list1": "Get started by editing",
@@ -457,6 +479,7 @@
   "NewsPage": {
     "title": "News",
     "createNewArticle": "Create New Article",
+    "subscribeToNews": "Get news alerts",
     "newsItem": {
       "moreDetails": "More Details",
       "editItem": "Edit Item",

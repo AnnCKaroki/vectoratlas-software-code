@@ -29,82 +29,75 @@ export class EmailService {
   ) {}
 
   async sendEmail(
-    emails: string[],
-    copyEmails: string[],
-    title: string,
-    emailBody: string,
-    files?: AttachmentLikeObject[],
-    communicationLog?: CommunicationLog,
-  ): Promise<boolean> {
-    const sendViaTransport = async () => {
-      try {
-        // //send email
-        const transporter = nodemailer.createTransport(
-          {
-            host: process.env.EMAIL_HOST,
-            port: Number(process.env.EMAIL_PORT),
-            secure: Boolean(Number(process.env.EMAIL_SECURE)),
-            auth: {
-              user: process.env.EMAIL_FROM,
-              pass: process.env.EMAIL_PASSWORD,
-            },
-          },
-          {
-            from: {
-              name: process.env.EMAIL_FROM,
-              address: process.env.EMAIL_FROM,
-            },
-          },
-        );
-        // const res = await this.mailerService.sendMail(mailOptions);
-        const res = await transporter.sendMail({
-          subject: title,
-          html: emailBody,
-          attachments: files,
-          to: emails,
-          cc: copyEmails,
-        });
-        // // Update sent status
-        await this.updateSentStatus(commLog, res);
-        await this.appendToSent(
-          commLog.subject,
-          allRecipients,
-          emailBody,
-        ).catch(console.error);
-        return true;
-      } catch (err) {
-        this.logger.error(err);
-        console.log(err);
-        throw err;
-      }
-    };
+  emails: string[],
+  copyEmails: string[],
+  title: string,
+  emailBody: string,
+  files?: AttachmentLikeObject[],
+  communicationLog?: CommunicationLog,
+): Promise<boolean> {
+  if (typeof emails === 'string') {
+    emails = [emails];
+  }
+  if (typeof copyEmails === 'string') {
+    copyEmails = [copyEmails];
+  }
 
-    if (typeof emails === 'string') {
-      emails = [emails];
-    }
-    if (typeof copyEmails === 'string') {
-      copyEmails = [copyEmails];
-    }
-    const mailOptions: ISendMailOptions = {
-      from: process.env.EMAIL_FROM,
-      to: emails,
-      cc: copyEmails,
-      subject: title,
-      html: emailBody,
-      attachments: files,
-    };
+  const allRecipients = emails.slice();
+  const commLog = await this.saveLog(communicationLog, allRecipients, emailBody);
 
-    // Log communication before attempting to send
-    const allRecipients = emails.slice();
-    const commLog = await this.saveLog(
-      communicationLog,
-      allRecipients,
-      emailBody,
+  if (process.env.EMAIL_DRY_RUN === 'true') {
+    this.logger.warn(
+      `EMAIL_DRY_RUN active — skipping real SMTP send to ${allRecipients.join(', ')}`,
     );
-
-    await sendViaTransport();
+    commLog.sent_status = CommunicationSentStatus.SENT;
+    commLog.sent_date = new Date();
+    commLog.sent_response = 'Dry run: no real email sent (EMAIL_DRY_RUN=true)';
+    await this.communicationLogService.upsert(commLog);
     return true;
   }
+
+  const sendViaTransport = async () => {
+    try {
+      const transporter = nodemailer.createTransport(
+        {
+          host: process.env.EMAIL_HOST,
+          port: Number(process.env.EMAIL_PORT),
+          secure: Boolean(Number(process.env.EMAIL_SECURE)),
+          auth: {
+            user: process.env.EMAIL_FROM,
+            pass: process.env.EMAIL_PASSWORD,
+          },
+        },
+        {
+          from: {
+            name: process.env.EMAIL_FROM,
+            address: process.env.EMAIL_FROM,
+          },
+        },
+      );
+      const res = await transporter.sendMail({
+        subject: title,
+        html: emailBody,
+        attachments: files,
+        to: emails,
+        cc: copyEmails,
+      });
+      this.updateSentStatus(commLog, res);
+      await this.appendToSent(commLog.subject, allRecipients, emailBody).catch(
+        console.error,
+      );
+      return true;
+    } catch (err) {
+      this.logger.error(err);
+      console.log(err);
+      throw err;
+    }
+  };
+
+  await sendViaTransport();
+  return true;
+}
 
   /**
    * Append sent emails to the sender's outbox

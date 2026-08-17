@@ -9,6 +9,7 @@ import { WinstonModule } from 'nest-winston';
 import { transports, format } from 'winston';
 import * as DailyRotateFile from 'winston-daily-rotate-file';
 // import DailyRotateFile from 'winston-daily-rotate-file';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const exportModule = await NestFactory.create(ExportModule);
@@ -68,6 +69,13 @@ async function bootstrap() {
       ],
     }),
   });
+  app.useGlobalPipes(
+  new ValidationPipe({
+    whitelist: true,        // strips properties not defined in the DTO
+    forbidNonWhitelisted: true, // rejects requests with extra unexpected fields
+    transform: true,        // auto-transforms payloads into DTO class instances
+  }),
+);
   app.use(json({ limit: '30mb' }));
   app.enableCors();
   await app.listen(3001);

@@ -10,14 +10,19 @@ import {
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 import NavLink from './navlink';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'; // Professional visual cue
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 export default function NavMenu({
   text,
   options,
 }: {
   text: string;
-  options: { text: string; url: string; icon?: React.ReactNode }[]; // Added icon support
+  options: {
+    text: string;
+    url?: string;
+    onClick?: () => void;
+    icon?: React.ReactNode;
+  }[];
 }) {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -31,16 +36,15 @@ export default function NavMenu({
     setAnchorEl(null);
   };
 
-  // Modern Navigation Style
   const navButtonStyle = {
     padding: '6px 12px',
     textTransform: 'none',
     fontWeight: 600,
     fontSize: '1.5rem',
-    borderRadius: '8px', // More modern than 40%
+    borderRadius: '8px',
     transition: 'all 0.2s',
     '&:hover': {
-      backgroundColor: 'rgba(0, 133, 63, 0.08)', // Soft Vector Atlas Green tint
+      backgroundColor: 'rgba(0, 133, 63, 0.08)',
       color: theme.palette.primary.main,
     },
   };
@@ -66,7 +70,6 @@ export default function NavMenu({
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
-        // Customizing the "Paper" (the actual container)
         PaperProps={{
           elevation: 0,
           sx: {
@@ -77,7 +80,6 @@ export default function NavMenu({
             borderRadius: '12px',
             border: '1px solid rgba(0,0,0,0.05)',
             '&:before': {
-              // Small arrow pointing up
               content: '""',
               display: 'block',
               position: 'absolute',
@@ -94,18 +96,39 @@ export default function NavMenu({
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        {options.map((option, index) => (
+        {options.map((option) => (
           <MenuItem
             key={option.text}
-            onClick={handleClose}
+            onClick={() => {
+              if (option.onClick) {
+                option.onClick();
+              }
+              handleClose();
+            }}
             sx={{
               py: 1.5,
               px: 2,
               '&:hover': { backgroundColor: '#f9fafb' },
             }}
           >
-            {/* NavLink wrap usually handles the click/navigation */}
-            <NavLink text={option.text} url={option.url} />
+            {option.url ? (
+              <NavLink text={option.text} url={option.url} />
+            ) : (
+              <Typography
+                variant="h5"
+                component="div"
+                color="primary"
+                sx={{
+                  padding: '8px',
+                  '&:hover': {
+                    backgroundColor: theme.palette.primary.light,
+                    borderRadius: '40%',
+                  },
+                }}
+              >
+                {option.text}
+              </Typography>
+            )}
           </MenuItem>
         ))}
       </Menu>

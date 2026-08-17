@@ -10,6 +10,8 @@ describe('EmailRegistryController', () => {
     findAllPaginated: jest.Mock;
     upsert: jest.Mock;
     remove: jest.Mock;
+    subscribe: jest.Mock;
+    verify: jest.Mock;
   };
   let recipientSelectionService: {
     findEligibleRecipientsPaginated: jest.Mock;
@@ -20,6 +22,8 @@ describe('EmailRegistryController', () => {
       findAllPaginated: jest.fn(),
       upsert: jest.fn(),
       remove: jest.fn(),
+      subscribe: jest.fn(),
+      verify: jest.fn(),
     };
     recipientSelectionService = {
       findEligibleRecipientsPaginated: jest.fn(),
@@ -73,6 +77,22 @@ describe('EmailRegistryController', () => {
     expect(
       recipientSelectionService.findEligibleRecipientsPaginated,
     ).toHaveBeenCalledWith(NotificationPreferenceType.NEW_DATASET, 0, 50);
+  });
+
+  it('subscribes and verifies via the public routes', async () => {
+    await controller.subscribe({
+      email: 'a@b.com',
+      isNewsEnabled: true,
+      isNewDatasetEnabled: false,
+    });
+    expect(emailRegistryService.subscribe).toHaveBeenCalledWith({
+      email: 'a@b.com',
+      isNewsEnabled: true,
+      isNewDatasetEnabled: false,
+    });
+
+    await controller.verify('code-123');
+    expect(emailRegistryService.verify).toHaveBeenCalledWith('code-123');
   });
 
   it('upserts and deletes via the service', async () => {

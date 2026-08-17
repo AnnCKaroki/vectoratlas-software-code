@@ -17,6 +17,7 @@ import { parsePaginationQuery } from '../../pagination/rest-pagination';
 import { EmailRegistry } from './entities/email-registry.entity';
 import { EmailRegistryService } from './email-registry.service';
 import { RecipientSelectionService } from './recipient-selection.service';
+import { SubscribeDto } from './dto/subscribe.dto';
 
 @Controller('email-registry')
 export class EmailRegistryController {
@@ -24,6 +25,16 @@ export class EmailRegistryController {
     private readonly emailRegistryService: EmailRegistryService,
     private readonly recipientSelectionService: RecipientSelectionService,
   ) {}
+
+  @Post('subscribe')
+  subscribe(@Body() body: SubscribeDto) {
+    return this.emailRegistryService.subscribe(body);
+  }
+
+  @Get('verify')
+  verify(@Query('code') code: string) {
+    return this.emailRegistryService.verify(code);
+  }
 
   /**
    * Admin: paginated list of all registry entries.

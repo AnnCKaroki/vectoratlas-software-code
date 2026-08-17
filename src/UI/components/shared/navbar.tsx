@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import EmailSubscriptionDialog from '../emailSubscription/EmailSubscriptionDialog';
 import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -20,6 +22,8 @@ import LanguageSwitcher from './LanguageSwitcher';
 import admin from '../../pages/admin';
 import uploader from '../dataset/uploader';
 import { useCountryDb } from './useCountryDb';
+import Button from '@mui/material/Button';
+
 
 export default function NavBar() {
   const t = useTranslations('MenuItems');
@@ -33,8 +37,11 @@ export default function NavBar() {
   const isAdmin = useAppSelector((state) =>
     state.auth.roles.includes(RolesEnum.ADMIN)
   );
+  const [subscribeOpen, setSubscribeOpen] = useState(false);
+
 
   const moreOptions = [
+    { text: t('subscribe'), onClick: () => setSubscribeOpen(true) },
     { text: t('species'), url: '/species' },
     { text: t('source'), url: '/sources' },
     { text: t('addSource'), url: '/new_source', role: 'uploader' },
@@ -108,13 +115,17 @@ export default function NavBar() {
   }
 
   // Language switcher
-  navMenuItems.push(<LanguageSwitcher key="languageSwitcher" />);
+   navMenuItems.push( <LanguageSwitcher key="languageSwitcher" />);
   return (
     <AppBar
       id="navbar"
       position="sticky"
       sx={{ bgcolor: 'white', top: 0, margin: 0, zIndex: 2 }}
     >
+    <EmailSubscriptionDialog
+      open={subscribeOpen}
+      onClose={() => setSubscribeOpen(false)}
+    />
       <Toolbar>
         <>
           <Box sx={{ flexGrow: 1, mt: '6px' }}>

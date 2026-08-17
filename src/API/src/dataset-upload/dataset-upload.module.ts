@@ -18,6 +18,8 @@ import { DOI } from 'src/db/doi/entities/doi.entity';
 import { EmailService } from '../email/email.service';
 import { AzureBlobService } from 'src/db/azure-blob/azure-blob.service';
 import { SharedModule } from 'src/db/shared/shared.module';
+import { NotificationsModule } from 'src/notifications/notifications.module';
+import { CommunicationLogModule } from 'src/db/communication-log/communication-log.module';
 
 @Module({
   controllers: [DatasetUploadController],
@@ -38,10 +40,11 @@ import { SharedModule } from 'src/db/shared/shared.module';
   imports: [
     HttpModule,
     SharedModule,
+    NotificationsModule,
     // DoiModule,
     // UploadedDatasetModule,
     // UploadedDatasetLogModule,
-    // CommunicationLogModule,
+  CommunicationLogModule,
     // UploadedDatasetLogModule,
     TypeOrmModule.forFeature([
       DOI,
