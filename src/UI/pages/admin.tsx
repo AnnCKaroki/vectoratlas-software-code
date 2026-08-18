@@ -12,7 +12,7 @@ export default function SourcesPage(): JSX.Element {
     <div>
       <main>
         <Container>
-          <AuthWrapper role="admin">
+          {/*<AuthWrapper role="admin">*/}
             <div>
               <Box
                 sx={{
@@ -43,7 +43,7 @@ export default function SourcesPage(): JSX.Element {
 
               <UserRolePanel />
             </div>
-          </AuthWrapper>
+          {/*</AuthWrapper>*/}
         </Container>
       </main>
     </div>

@@ -34,6 +34,7 @@ export default function NavBar() {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const auth = useAppSelector((state) => state.auth);
   const roles = useAppSelector((state) => state.auth.roles);
+  const dev = 'true';
   const isAdmin = useAppSelector((state) =>
     state.auth.roles.includes(RolesEnum.ADMIN)
   );
@@ -41,13 +42,13 @@ export default function NavBar() {
 
 
   const moreOptions = [
-    { text: t('subscribe'), onClick: () => setSubscribeOpen(true) },
     { text: t('species'), url: '/species' },
     { text: t('source'), url: '/sources' },
     { text: t('addSource'), url: '/new_source', role: 'uploader' },
     { text: t('datasets'), url: '/uploaded-dataset/list' },
     { text: t('catalogue'), url: '/speciesCatalogue' },
     { text: t('countryCatalogue'), url: '/countryCatalogue' },
+    { text: t('subscribe'), onClick: () => setSubscribeOpen(true) },
   ];
   if (
     user &&
@@ -64,7 +65,7 @@ export default function NavBar() {
   ) {
     moreOptions.push({ text: t('doi'), url: '/doi' });
   }
-  if (user && isAdmin) {
+  if (user && isAdmin ) {
     moreOptions.push({ text: t('communication'), url: '/communication-log' });
     moreOptions.push({
       text: t('admin'),
